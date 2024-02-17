@@ -2,6 +2,7 @@
 // let a: string = "hello";
 // a = 1234;
 
+import { triggerAsyncId } from "async_hooks";
 import { arrayBuffer } from "stream/consumers";
 
 //npm init -y
@@ -176,3 +177,153 @@ type intersect = { name: "Eunhye" } & { age: 25 };
 //또는 이면 밑에 exmaple에 속성 한 개만 있어도 된다.
 type intersect2 = { name: "Eunhye" } | { age: 25 };
 const intersectexample = { name: "Eunhye", age: 25 };
+
+//1.8. type aliias, interface extends
+type Animal = { breath: true };
+type Poyouru = Animal & { breed: true };
+type Human = Poyouru & { think: true };
+
+interface C1 {
+  breath: true;
+}
+
+//여기서 interface D1 extends Human 이렇게도 된다. type을 extends할 수도 있음
+interface D1 extends C1 {
+  breed: true;
+}
+
+const D2: D1 = { breath: true, breed: true };
+const zerocho: Human = { breath: true, breed: true, think: true };
+
+//인터페이스는 서로 합쳐진다는 특성이 있어서
+//이것을 바탕으로 라이브러리를 수정하기도 한다.
+
+interface C2 {
+  talk: () => void;
+}
+
+interface C2 {
+  eat: () => void;
+}
+
+interface C2 {
+  shit: () => void;
+}
+
+const D3: C2 = { talk() {}, eat() {}, shit() {} };
+//예전에는 interface IProps, type TAlias, enum Ehello 이런식으로 네이밍하기도
+
+//1.8. 타입을 집합으로 생각하자 (좁은 타입과 넓은 타입)
+//큰 타입과 작은 타입 이런 것을 구분할 줄 알아야 한다.
+//좁은 타입에서 넓은 타입으로 대입이 가능하다.
+//넓은 타입에서 좁은 타입으로는 대입이 불가능하다.
+//여기서 type이 제일 좁은 것은 type C이다.
+//객체는 상세할 수록 좁다.
+type A9 = { name: string };
+type B9 = { age: number };
+type AB = A9 | B9;
+type C9 = { name: string; age: number };
+//이렇게하면 type error가 난다.
+
+//잉여 속성 검사라고 검사를 하나 더 하기 때문이다.
+// const D9 : C9 = { name: 'eunhye', age: 25, married: false}
+//그럴 때는 이렇게 데이터로 중간에 빼주면 된다.
+const D9 = { name: "eunhye", age: 25, married: false };
+const F9: C9 = D9;
+
+//1.9. void의 두 가지 사용법'
+//interface끼리는 서로 합쳐진다.
+//반면 type 끼리는 합쳐지지 않는다.
+//type B : {name:string}, type B : {hobby: string}
+//이러면 합쳐지지는 않고 에러가 난다. {a:'hello', b:'go'} 이러면 에러가 난다.
+//typescript에서 객체 리터럴을 바로 대입할 때는 잉여 속성 검사라는 추가기능이 있다.
+
+//void
+
+// function a():void{
+
+// }
+
+// const b = a;
+//1. 함수 return 값이 void type이라는 것은 리턴 값을 넣으면 안 되는 함수라는 것이다.
+//2. 대신 undefined는 되고 null은 안 된다.
+// function a():void{
+//   return null;
+// }
+
+//3.void function 으로 선언할 때랑 메소드로 선언할 때가 다르다!
+//함수의 리턴값이 직접적으로 void인 경우에는 리턴하면 에러가 나고
+//매개변수와 리턴갑은 상관이 없다.
+//return값이 직접적 void는 리턴값이 없다는 듯이고
+//매개변수와 리턴 값 의 void는 직접적으로 사용하지 않겠다라는 의미
+function a10(): void {}
+
+//void는 리턴값이 void 인 것, 매개변수가 void 함수 들어간 것, 메서드 보이드 함수 들어간 것
+//신기한 것은 매개변수가 void인 함수도 return 값이 존재해도 된다.
+
+//함수에 이렇게 직접적으로 존재할 때만 return 값 쓰면 안된다.
+function a11(callback: () => void): void {}
+
+a11(() => {
+  return "3";
+});
+
+//메서드도 리턴값이 존재할 수 있다.
+interface Human11 {
+    talk: () => void;
+  }
+  
+  const human10 : Human11 {
+      talk(){return 'abc';} //talk(){return } 이렇게 해도 되는데
+  }
+
+  //declare
+  //함수도 body없이 선언할 수 있다.
+  //declare 안 붙이면 원래 forEach 처럼 선언해줘야하는데
+  //declare붙이면 안 그래도 된다. 다만 js로 변환안된다.
+  declare function forEach(arr: number[], callback:(el:number) => undefined) :void;
+//   forEach(){
+//   }
+let target : number[] = [];
+//이렇게 하면 callback 값이 undefined이기 때문에 에러가 난다.
+// forEach([1,2,3], el => target.push(el));
+
+//undefied를 number로 선언해도, void로 선언해도 에러가 안 난다.
+//매개변수에서 쓰이는 void는 실제 리턴 값이 뭐든 상관 안한다는 것이기 때문이다.
+//{target2.push(el)} 처럼 리턴 값을 없애도 쓸 수 있게 한다.
+declare function forEach2(arr: number[], callback:(el:number) => void) :void;
+let target2 : number[] = [];
+//만약 void를 undefined로 바꾸면 이 두개는 원래는 같은 값이 나와야하지만
+//다른 에러가 뜬다. number랑 undefined 에러
+//number로 바꾸면 위에가 여전히 number에러가 뜬다. 
+//그래서 결국 void로 바꾸게 된다.
+//반대로 undefined는 void에 대입 가능하다.
+forEach2([1,2,3], el => target2.push(el));
+forEach2([1,2,3], el => {target2.push(el)});
+//1.10. unknown과 any(그리고 타입 대입가능표)
+
+interface A11{
+    talk: () => void;
+}
+
+const b11 : A11 {
+    talk(){return;}
+}
+
+const c11 = b11.talk();
+
+//1.11. 타입 좁히기(타입 가드)
+
+//1.12. 커스텀 타입 가드(is, 형식 조건자)
+
+//1.13.{}과 Object
+
+//1.14. readonly, 인덱스드 시그니처, 맵드 타입스
+
+//1.15. 클래스의 새로운 기능들
+
+//1.16. 옵셔널, 제네릭 기본
+
+//1.17. 기본값 타이핑
+
+//2. 섹션 2. lib.es5.d.ts 분석
