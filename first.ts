@@ -233,23 +233,58 @@ const F9: C9 = D9;
 
 //1.9. void의 두 가지 사용법'
 //interface끼리는 서로 합쳐진다.
-//반면 type 끼리는 합쳐지지 않는다.
+//반면 type alias끼리는 합쳐지지 않는다.
 //type B : {name:string}, type B : {hobby: string}
 //이러면 합쳐지지는 않고 에러가 난다. {a:'hello', b:'go'} 이러면 에러가 난다.
 //typescript에서 객체 리터럴을 바로 대입할 때는 잉여 속성 검사라는 추가기능이 있다.
 
+//1.9.1.객체 리터럴에서는 잉여 속성 검사라는게 있다.
+interface Ex1 {a:string}
+//이렇게 하면 b에서 에러가 난다.
+// const exam1: Ex1 = {a:'hello', b:'world'};
+//그런데 exam2를 따로 변수로 빼서 관리하면 관리를 안한다.
+const exam1 = {a:'hello', b:'world'};
+const exam2: Ex1 = exam1;
+
 //void
-
-// function a():void{
-
+//이렇게 하면 자동으로 둘다 void로 return 값이 추론된다.
+// function a(){
 // }
-
 // const b = a;
+
+//void라는건 return 값이 없다는 것, 대신 reutn undefined는 된다. null도 안된다.
 //1. 함수 return 값이 void type이라는 것은 리턴 값을 넣으면 안 되는 함수라는 것이다.
 //2. 대신 undefined는 되고 null은 안 된다.
 // function a():void{
 //   return null;
 // }
+
+interface Human3 {
+  talk: () => void;
+}
+
+//void return 값이 이렇게 들어가도 어떻게 되는거지?
+const human3 : Human3 = {
+  talk(){return 'abc';}
+}
+
+//그래서 function에서는 세가지로 기억해야한다.
+//이렇게 function으로 한 것 과
+//+매개변수로 선언한 void (리턴값 존재해도 된다.)
+// a11(() => {
+//   return "3";
+// });
+//리턴값이 있는 건 그 안에 있는 return 값을 사용하지 않겠다는 의미
+//리턴값이 없는 건 그냥 리턴값이 없다!
+function v1(callback : () => void): void {
+
+}
+
+interface V2 {
+  talk: () => void
+}
+//메소드로 한 것으로
+
 
 //3.void function 으로 선언할 때랑 메소드로 선언할 때가 다르다!
 //함수의 리턴값이 직접적으로 void인 경우에는 리턴하면 에러가 나고
@@ -281,6 +316,7 @@ interface Human11 {
   //함수도 body없이 선언할 수 있다.
   //declare 안 붙이면 원래 forEach 처럼 선언해줘야하는데
   //declare붙이면 안 그래도 된다. 다만 js로 변환안된다.
+  //declare는 외부에서 선언된,다른데서 선언된걸 내가 보장할 수 있어 이런경우 붙인다..
   declare function forEach(arr: number[], callback:(el:number) => undefined) :void;
 //   forEach(){
 //   }
@@ -289,7 +325,7 @@ let target : number[] = [];
 // forEach([1,2,3], el => target.push(el));
 
 //undefied를 number로 선언해도, void로 선언해도 에러가 안 난다.
-//매개변수에서 쓰이는 void는 실제 리턴 값이 뭐든 상관 안한다는 것이기 때문이다.
+//매개변수에서 쓰이는 void는 실제 리턴 값이 뭐든 상관 안한다는 것이기 때문이다.!!
 //{target2.push(el)} 처럼 리턴 값을 없애도 쓸 수 있게 한다.
 declare function forEach2(arr: number[], callback:(el:number) => void) :void;
 let target2 : number[] = [];
@@ -301,16 +337,51 @@ let target2 : number[] = [];
 forEach2([1,2,3], el => target2.push(el));
 forEach2([1,2,3], el => {target2.push(el)});
 //1.10. unknown과 any(그리고 타입 대입가능표)
-
+//unknown을 쓸 바에는 any를 쓰자.
+//unknown을 쓰면 직접 타입을 정해주어야 한다.
+//unknwon도 없는게 베스트지만 지금 당장 타입을 모를때 쓴다.
 interface A11{
-    talk: () => void;
+    talk2: () => void;
+}
+//이렇게 해도 되는데
+const b11 : A11 = {
+    talk2(){return 3;}
 }
 
-const b11 : A11 {
-    talk(){return;}
+const b12 = b11.talk2() as unknown as number;
+//b11.talk2() as number 하면 에러나는데 에러 책임질 수 있으면 unknwon 붙인다.
+//혹은 const b = <number><u nk..></ua.talk()이렇게 근데 as number를 추천한다.
+
+//unknown 은 당장 타입은 모르겠고 
+//나중에 쓸 때
+const c11 : unknown = b11.talk2();
+(b11 as A11).talk2();
+
+//unknown error 뜨는 대표적인 것이 try catch임
+
+//b11 to string이 숫자여서 안되니까 위에 d11처럼 as unknown으로 강제로 바꿔줘야한다.
+b11.toString();
+
+//unknown이 나오는 가장 흔한 경우가 try error 일때이다.
+//타입 지정 안해주면 error가 unknown이 나온다.
+try{
+
+}catch(error){
+  (error as Error).message
 }
 
-const c11 = b11.talk();
+//error as AxiosError 이런 것도 있다.
+
+//빈배열은 모두 never이다.
+//any가 떠도 문제지만 never가 떠도 문제니까 
+//문제 안생기게 타이핑 잘 해주자.
+//초록색 체크화살표도 없는 것이라 생각하자.
+//표 보고 any는 void에 대입가능하다, undefined는 void에 대입가능하다
+//근데 null은 안된다.. 이렇게 생각하면 된다.
+// 이건되는데 null은 안된다는..
+// function a():void{
+//   return undefined;
+// }
 
 //1.11. 타입 좁히기(타입 가드)
 
