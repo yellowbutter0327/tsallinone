@@ -498,12 +498,95 @@ const cat2 = {eat()};
 //   a
 // }
 //1.12. 커스텀 타입 가드(is, 형식 조건자)
+//위에처럼말고 타입을 구분해주는 커스텀 함수를 직접 만들 수 있다.
+//return값이 is가 들어가 있는 것은 커스텀 타입 가드 함수이다. 
+//타입가드함수는 if문 안에 써서 정확한 타입을 알ㄹ려주는 것이다.
+//대신 타입 판별은 직접 코딩을 해야한다.
+//위에껄로 타입판별하기 너무 복잡하거나, is가 아니면 타입 추론이 안되는 경우
+interface Cat{meow2:number};
+interface Dog{bow2:number};
+function catOrDog(a:Cat|Dog) : a is Dog{
+  if((a as Cat).meow2){return false}
+  return true
+}
+
+function pet(a: Cat | Dog){
+  //밑에처럼도 할 수 있는데 커스텀 함수로도 할 수 있다.
+  if(catOrDog(a)){
+    console.log(a.bow2);
+  }
+
+  if('meow2' in a){
+    console.log(a.meow2);
+  }
+}
 
 //1.13.{}과 Object
+//ts 4.8 업그레이드 버전과 관련이 있다.
+//{}이랑 Object가 꼭 객체를 뜻하는게 아니라 문자열도 대입이 된다..
+//즉, null과 undefined를 제외한 모든 타입을 뜻한다!
+//실제 객체는 소문자로 해야한다.
+const x15: {} = 'hello';
+const y15:Object = 'hi'; 
+const y16:object = {hello:'world'}; //object 지양, interface, type, class 쓰면 된다.
+//{},Object: null과 undefined를 제외한 모든 타입을 뜻한다!
+//unknown = {}|null|undefined; 합쳐진 것이라 생각하면 된다.
+//4.8버전 이전에는 이렇게 하면
+//if(z){z;} 이 타입이 그대로 unknwon이 나왔다. 하지만 4.8이후에는 {} 이렇게 나온다.
+//이 타입은 객체가 아니라 모든 타입을 나타낸다.
+const z15:unknown = 'hi';
+if(z15){
+  z15; //4.8이상에서는 {}이렇게 나온다. if문 안에 들어가면 null,undefined가 나와서 
+}else{
+  x15;
+}
+
 
 //1.14. readonly, 인덱스드 시그니처, 맵드 타입스
+//readonly: 속성을 실수로 바꿔주는 것을 막아주는 readonly;
+interface A16 {
+  readonly a:string;
+  b:string;
+}
+
+const aaaa:A16 = {a:'hello', b:'world'};
+// aaaa.a = '123'; readonly 했기 때문에 안 바뀐다. 
+
+//인덱스드 시그니처: 속성이 많은데 다 문자열이었으면 좋겠어.., 
+// type A = {a:string, b:string, ...., d:string}
+// type A = { [key:string]:string };
+// type A = {a:3, b:1, ...., d:5}
+// type A = { [key:string]:number};
+
+//맵드 타임스
+//이렇게 키에 제한을 걸어둘 수 있다. 
+//인터페이스는 |나 &가 안돼서 type으로 써야한다.
+type B17 = 'Human' | 'Mammal' | 'Animal';
+type A17 = {[key in B17] : number};
+const aaaa17 : A17 = {Human:123, Mammal: 5, Animal:3};
+
 
 //1.15. 클래스의 새로운 기능들
+class A18{
+  a:string;
+  b:number;
+  //constructor 적어주는게 정석이고 안적으면 이렇게 하면 된다.
+  // a:string ='123';
+  // b:number = 123;
+
+  //b처럼 기본값이 있으면 new A18('123') 이렇게 뒤에없어도
+  //b? 물음표 안붙인다. new A18('123',999) 이렇게 넣어주면 값 덮어쓰겠지
+  constructor(a:string, b: number= 123){
+    this.a = a;
+    this.b = b;
+  }
+
+  method(){
+
+  }
+}
+
+const a20 = new A18('123',123);
 
 //1.16. 옵셔널, 제네릭 기본
 
