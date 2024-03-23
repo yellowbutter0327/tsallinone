@@ -2,6 +2,7 @@
 // let a: string = "hello";
 // a = 1234;
 
+import { assertObjectExpression, isFor } from '@babel/types';
 import { triggerAsyncId } from "async_hooks";
 import { arrayBuffer } from "stream/consumers";
 
@@ -349,6 +350,21 @@ const b11 : A11 = {
 }
 
 const b12 = b11.talk2() as unknown as number;
+// interface A{
+//   talk:()=> void;
+// }
+
+//이렇게 해도 에러 안나는데 
+// const a:A ={
+//   talk(){return 3;}
+// }
+
+//문제는 이렇게 하면 에러가 난다.
+//애초에 void자체는 return 값이 없어야하는데 3이 있는거니까
+//const b = a.talk();
+//그래서 이런건 책임진다고 하면 이렇게 바꿔줘야 한다.
+//const b = a.talk() as unknown as number; 
+
 //b11.talk2() as number 하면 에러나는데 에러 책임질 수 있으면 unknwon 붙인다.
 //혹은 const b = <number><u nk..></ua.talk()이렇게 근데 as number를 추천한다.
 
@@ -384,7 +400,103 @@ try{
 // }
 
 //1.11. 타입 좁히기(타입 가드)
+//에러 메세지는 마지막 것만 보면 된다.
+//이렇게 a가 number일 수도, string 일 수도 있는 경우가 있을때
+//as number는 위험한 방법이다.
+//numOrstr 처럼 밑에서 실수할 수도 있기 때문이다.
+//unknown일 때 빼고는 as 안 해야한다!
+// function numOrStr(a:number | string){
+//   (a as number).toFixed(1);
+// }
 
+// numOrStr('123')
+
+function numOrStr(a:number |string){
+  if(typeof a === 'number'){
+    a.toFixed(1);
+  }else{
+    a.charAt(3);
+  }
+  if(typeof a === 'string'){
+    a.charAt(3);
+  }
+  //애초에 boolean이 들어올 수 없기 때문에
+  //이 경우는 a가 never가 된다.
+  // if(typeof a === 'boolean'){
+  //   a.toString();
+  // }
+}
+
+//이렇게 배열일때는 Array isArray 이런식으로 표현한다.
+//배열아니면 typeof으로 체크한다.
+function numOrNumArray(a:number | number[]){
+  if(Array.isArray(a)){
+    a.concat(4);
+  }else{
+    a.toFixed(3);
+  }
+}
+
+//클래스는 그 자체로 타입이 될 수 있다.
+//인스턴스의 이름을 클래스 타입으로 한다는 뜻임
+
+class A13{
+  aaa(){}
+}
+
+class B13{
+  bbb(){}
+}
+
+function aOrB(param: A13 | B13){
+  //클래스에서는 instanceof 를 사용한다.
+if(param instanceof A13){
+  param.aaa();
+}
+}
+
+type B14 = {type: 'b14', bbb:string};
+type C14 = {type: 'c14', ccc:string};
+type D14 = {type: 'd14', ddd:string};
+
+//객체 간의 타입 구별 예시
+//안에 속성 만으로도 구별을 해준다.
+function typeCheck(a: B14|C14|D14){
+  if(a.type === 'b14'){
+  a.bbb;
+  }else if (a.type === 'c14'){
+    a.ccc;
+  }else{
+    a.ddd;
+  }
+}
+
+aOrB(new A13());
+aOrB(new B13()); 
+
+//값으로 구분을 했다면 속성으로 구분하는 방법
+function typeCheck2(a: B14|C14|D14){
+  if('bbb' in a){
+  a.bbb;
+  }else if ('ccc' in a){
+    a.ccc;
+  }else{
+    a.ddd;
+  }
+}
+
+//객체를 여러개 만들때 이런 습관을 들여놓으면 좋다.
+const human = {type:'human'};
+const dog = {type:'dog'};
+const cat = {type:'cat'};
+//아니면 함수로 꺼내쑬 수 있게 
+const human2 = {walk()};
+const dog2 = {bow()};
+const cat2 = {eat()};
+//쓸때는 이런식으로
+// if('walk' in a){
+//   a
+// }
 //1.12. 커스텀 타입 가드(is, 형식 조건자)
 
 //1.13.{}과 Object
