@@ -566,7 +566,7 @@ type A17 = {[key in B17] : number};
 const aaaa17 : A17 = {Human:123, Mammal: 5, Animal:3};
 
 
-//1.15. 클래스의 새로운 기능들
+//1.15. 클래스의 새로운 기능들 -implements, abstract, public, protected, private
 class A18{
   a:string;
   b:number;
@@ -586,7 +586,107 @@ class A18{
   }
 }
 
+
 const a20 = new A18('123',123);
+//기본값은 안 넣어줘도 에러가 안난다.
+const a21 = new A18('123')
+
+//클래스 이름은 그 자체로 타입이 될 수 있다.
+//A18은 클래스를 가리키는게 아니라 new A18를 가리킨다.
+type A19 = A18;
+const a22: A18 = new A18('123');
+//클래스 자체의 타입은 typeof이다.
+//클래스 이름은 인스턴스를 가리킨다.
+//new A18('123')가 아니라 A18이다.
+const b22: typeof A18 = A18;
+
+//자바스크립트의 property보다는 ts를 추천한다.
+//protected랑 구분이 안되기 때문이다.
+//private property
+//앞에 # 붙이면 된다.
+
+class A20{
+  private a:string = '123';
+  #b:number = 123;
+  //protected가 안되기 때문에 정교하게 쓰고 싶으면 private
+  
+  method(){
+  console.log(this.a, this.#b);
+  }
+}
+
+//class가 interface를 따라야한다.
+//js로 변환되면 interface, implements 사라진다.
+//class 모양을 interface로 통제할 수 있다.
+interface A21{
+  readonly a :string;
+  b: string;
+}
+
+//java에서는 객체지향 중시하는 사람은 꼭 implements 만들어서 쓴다.
+//근데 이건 js니까 interface 안 만들어 쓰는 사람이 많다.
+//interface는 js로 변환해도 사라지는데 
+//class같은 경우는 사라지지 않아서 class내부의 것을 가져다 쓸 수 있다.
+//강사님은 implements를 거의 쓰지 않는다. abstract로 추상 클래스 만들어서 써도 되니까
+class B21 implements A21 {
+  //private, protectec가 객체지향에서 쓰는 것
+  //class B21 안에서만 쓸 수 있음
+  //여기서도 readonly 붙일 수 있음
+  //근데 private readonly랑 private랑은 다르다고 보겠지
+  private a: string = '121';
+  protected b: string = 'world';
+  //public은 일반적인 속성으로 아무렇게나 접근이 가능하다.
+  public c: string= 'wow';
+  method(){
+    //이렇게 클래스 안에서는 쓸 수 있는데 밖에서는 못쓴다.
+    //참고로 콘솔을 쓰려면 lib에서 dom을 추가해주자
+    console.log(this.a);
+    //protected도 안에서는 기본으로 쓸 수 있다. 밖에서 못씀
+    console.log(this.b);
+    //public은 밑에 C21 말고 여기 안, 즉 안, 밖 둘다 쓸 수 있음
+    console.log(this.c);
+  }
+}
+
+//추상 클래스도 가능
+//실제 구현은 class C21~ 여기서 한 거
+// abstract class B21{
+//   private a: string = '121';
+//   protected b: string = 'world';
+//   abstract method(): void;
+// 추상 클래스도 실제적인 메서드도 갖고 있을 수 있다. 
+// method2(){
+// return '3'
+// }
+// }
+//abstract로 되어있는거는 밑에 C21이든 어디서든 반드시 구현해줘야한다.
+
+class C21 extends B21{
+  //protected, private 차이 : 상속받았을때 쓸 수 있냐
+
+method(){
+  //얘는 private 니까 못쓴다.
+  // console.log(this.a);
+  console.log(this.b);
+  console.log(this.c);
+}
+ 
+}
+
+//private는 이렇게 접근이 안되는 애들
+//protected도 밖에서는 못 쓴다.
+//c는 public이니까 아무렇게 접근이 가능하다.
+ // new C21().a;
+// new C21().b;
+new C21().c;
+
+//정리
+//         public     protected    private
+//클래스내부    o           o           o
+//인스턴스     o           x           x
+//상속클래스    o           o          x
+
+//js로 변환하면 public, private 다 사라진다. 
 
 //1.16. 옵셔널, 제네릭 기본
 
