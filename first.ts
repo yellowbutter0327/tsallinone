@@ -689,7 +689,59 @@ new C21().c;
 //js로 변환하면 public, private 다 사라진다. 
 
 //1.16. 옵셔널, 제네릭 기본
+function abc(a:number, b?:number, c?:number){}
+abc(1);
+abc(1,2) //abc(1,2,3)이렇게 없어도 된다.
+//그럼 abc(1,2,3,4) 이렇게 전부받고 싶으면?
+//이런식으로 짜면 된다.
+function abc2(...args:number[]){}
 
+let objjeneric : {a:string, b?:string} = {a:'hello', b:'world'};
+objjeneric = {a:'hello'};
+
+//제네릭 : 타입을 변수처럼 만드는 것
+//만들어놓을때는 어떤 타입인지 모르지만 실제로 사용할 때 그 타입이 정해진다.
+function genericAdd<T extends string|number>(x:T, y:T):T{
+  return x + y
+}
+genericAdd(1,1);
+genericAdd('2','3');
+// 얘는 안되겠지 genericAdd(1,'3');
+//genericAdd(true,false) 이렇게 하면 안되니까 extends로 타입정해준다.
+
+//제네릭을 여러개만들면서 각각 제한을 둘 수도 있다.
+function genericAdd2<T extends string, K extends number>(x:T, y:K):T{
+  return x + y
+}
+
+function genericAdd3<T extends {a:string}>(x:T):T{return x};
+genericAdd3({a:"hello"})
+
+function genericAdd4<T extends string[]>(x:T):T{return x};
+genericAdd4(['1','2','3'])
+
+
+function genericAdd5<T extends (a:string) => number>(x:T):T{return x};
+genericAdd5((a) => +a);
+
+//모든 함수 : 제한 없다는 뜻 (많이 쓰지는 않는다.)
+function genericAdd6<T extends (...args:any) => any>(x:T) : T {return x};
+
+//constructor 타입 정의
+function genericAdd7<T extends abstract new (...args:any) => any>(x:T) : T {return x};
+//class A{} add(new A()) 이렇게 new는 안되는데 add(A)이렇게는 된다.
+interface Aa{
+  constructor():void
+}
+class A22 implements Aa{
+  constructor(){}
+}
+genericAdd7(A22) 
+//  이렇게는 된다. 생성자는 된다. class는 생성자니까
+//class A는 A 자체가 타입이다. class 안에 constructor가 있는데
+//이 constructor의 타입은 무엇일까
+//abstract가 꼭 들어가 있어야 한다. 
+//<T extends abstract new (...args :any) => any> 이런식으로 생성자
 //1.17. 기본값 타이핑
 
 //2. 섹션 2. lib.es5.d.ts 분석
