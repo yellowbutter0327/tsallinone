@@ -745,3 +745,6 @@ genericAdd7(A22)
 //1.17. 기본값 타이핑
 
 //2. 섹션 2. lib.es5.d.ts 분석
+const add5 = <T>(x : T, y: T)=>({x,y});
+//보통 react에서는 jsx 문법 때문에 <T = unknown> 이런식으로 기본 값을 넣어주기도 한다.
+const add6 = <T = unknown>(x : T, y: T)=>({x,y});
