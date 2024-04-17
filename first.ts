@@ -6,17 +6,17 @@ import { assertObjectExpression, isFor } from '@babel/types';
 import { triggerAsyncId } from "async_hooks";
 import { arrayBuffer } from "stream/consumers";
 
-//npm init -y
-//npm i typescript
-//npx tsc
-//npx tsc --init
-//tsconfig json을 allowjs 해제, strict를 절대 false로 만들지 말기
-//target: ES5 라하면 인터넷 익스플로어에서도 돌아가게 한다. ES3까지 가능하다.
-//module: 최신 module 쓰고 싶으면  es2015 , node module하고 싶으면 nodejs
-//npx tsc --noEmit: 타입 게속 검사, 에디터 없으면 매번 해줘야함
-//npx tsc : 에러가 있지만 자바스크립트로 바꿔줌
-//forceConsistentCasingInFileNames : 윈도우하다가 리눅스나 맥으로 오면 대소문자 에러
-//skipLibCheck : 라이브러리들에는 모두 d.ts와 같은 파일이 있는데 실제로 쓰는 타입만 검사해라.
+// npm init -y
+// npm i typescript
+// npx tsc
+// npx tsc --init
+// tsconfig json을 allowjs 해제, strict를 절대 false로 만들지 말기
+// target: ES5 라하면 인터넷 익스플로어에서도 돌아가게 한다. ES3까지 가능하다.
+// module: 최신 module 쓰고 싶으면  es2015 , node module하고 싶으면 nodejs
+// npx tsc --noEmit: 타입 게속 검사, 에디터 없으면 매번 해줘야함
+// npx tsc : 에러가 있지만 자바스크립트로 바꿔줌
+// forceConsistentCasingInFileNames : 윈도우하다가 리눅스나 맥으로 오면 대소문자 에러
+// skipLibCheck : 라이브러리들에는 모두 d.ts와 같은 파일이 있는데 실제로 쓰는 타입만 검사해라.
 
 //1.1 타입스크립트는 변수, 매개변수, 리턴값에 타입 붙이는 것!
 const a: number = 5;
@@ -114,7 +114,9 @@ function rest(a, ...args: string[]) {
 
 rest("1", "2", "3");
 
-//tuple
+//tuple : 서로 다른 타입의 요소와 고정된 길이를 갖는다.
+//터플이라고 읽는다. 터플은 배열 순서를 기억해야한다는 주의점이 있음
+//데이터 구조와 타입을 동시에 정의하여 코드를 더 명확하게 표현할 수 있다.
 const tuple: [string, number] = ["1", 5];
 // tuple[2] = 4 typescript가 얘는 막는데
 //tuple.push(2) //얘는 못 막아준다.
@@ -743,8 +745,11 @@ genericAdd7(A22)
 //abstract가 꼭 들어가 있어야 한다. 
 //<T extends abstract new (...args :any) => any> 이런식으로 생성자
 //1.17. 기본값 타이핑
-
-//2. 섹션 2. lib.es5.d.ts 분석
 const add5 = <T>(x : T, y: T)=>({x,y});
 //보통 react에서는 jsx 문법 때문에 <T = unknown> 이런식으로 기본 값을 넣어주기도 한다.
 const add6 = <T = unknown>(x : T, y: T)=>({x,y});
+//이렇게 하던가 아니면 <T extends unknown> 이런식으로 하던가
+//<T,> 이렇게 해도 되는데 의도가 드러나지 않기 때문에 왠만하면..
+
+//2. 섹션 2. lib.es5.d.ts 분석
+
