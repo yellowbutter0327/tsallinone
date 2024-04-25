@@ -5,6 +5,7 @@
 import { assertObjectExpression, isFor } from '@babel/types';
 import { triggerAsyncId } from "async_hooks";
 import { arrayBuffer } from "stream/consumers";
+import { isTypeNode, OverrideKeyword } from 'typescript';
 
 // npm init -y
 // npm i typescript
@@ -752,4 +753,31 @@ const add6 = <T = unknown>(x : T, y: T)=>({x,y});
 //<T,> 이렇게 해도 되는데 의도가 드러나지 않기 때문에 왠만하면..
 
 //2. 섹션 2. lib.es5.d.ts 분석
+//forEach, map 제네릭 분석
 
+//foreach는 이렇게 제네릭을 만들어두기 때문에 입력값일 때는 타입을 모르지만
+//실행할때 타입을 알 수 있게 한다. 
+interface Array<T>{
+  forEach(callbackfn: (value:T, index:number, array:T[])=>void, thisArgs?:any):void;
+}
+//그냥 제네릭안하고 <string|number|boolean>이렇게 하면 안되나요?
+//그럼 또 string|number 이런 함정에 빠지게 된다.
+
+const forEachA : Array<number> = [1,2,3];
+forEachA.forEach((value)=> {console.log(value)});
+
+//function add<T>(a:T,b:T):T {return x}
+//여기 T 붙은건 제네릭
+//add<number>(1,2) 이렇게 된건 제니릭 타입 파라미터이다. 
+// <number>add(1,2) 이렇게 하면 강제변환하는 as 문법이다.
+
+//map
+//ts는 map을 어떻게 잘 추론할까?
+interface mapArray<T>{
+forEach(callbackfn: (value:T, index:number, array:T[]) => void, thisArgs?: any):void;
+map<U>(callbackfn: (value:T, index:number, array:T[]) => U[], thisArgs?: any):U[];
+}
+
+const mapstrings = [1,2,3].map((item) => item.toString());
+//여기서 T는 number U는 string 임 리턴값의 타입은 앞의 U니까 string 이고
+//map함수 전체의 리턴값은 맨 뒤 U겠지?
